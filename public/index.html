@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voodoo Game Database</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      .fade-enter-active,
+      .fade-leave-active {
+        transition: opacity 0.3s ease;
+      }
+      .fade-enter-from,
+      .fade-leave-to {
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <div id="app" class="container mx-auto px-4 py-8">
+      <header class="mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-2">Voodoo Game Database</h1>
+        <p class="text-gray-600">Browse and search through our collection of games</p>
+      </header>
+
+      <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div class="flex justify-between items-center mb-6">
+          <div class="flex-1">
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search games..."
+              class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div class="ml-4">
+            <select
+              v-model="selectedPlatform"
+              class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Platforms</option>
+              <option value="ios">iOS</option>
+              <option value="android">Android</option>
+            </select>
+          </div>
+          <button
+            @click="searchGames"
+            class="ml-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Search
+          </button>
+        </div>
+
+        <div class="flex justify-end mb-4">
+          <button
+            @click="populateDatabase"
+            class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+          >
+            <i class="fas fa-download mr-2"></i>Populate Database
+          </button>
+        </div>
+
+        <div v-if="loading" class="text-center py-8">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+        </div>
+
+        <div v-else-if="error" class="text-center py-8 text-red-500">{{ error }}</div>
+
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div
+            v-for="game in games"
+            :key="game.id"
+            class="bg-gray-50 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div class="flex items-start space-x-4">
+              <img
+                :src="game.iconUrl"
+                :alt="game.name"
+                class="w-16 h-16 rounded-lg object-cover"
+                @error="$event.target.src = 'https://via.placeholder.com/150'"
+              />
+              <div class="flex-1">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-lg font-semibold text-gray-800">{{ game.name }}</h3>
+                  <span
+                    :class="game.platform === 'ios' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'"
+                    class="px-2 py-1 rounded-full text-sm"
+                  >
+                    {{ game.platform }}
+                  </span>
+                </div>
+                <div class="text-sm text-gray-600 space-y-1">
+                  <p class="flex items-center">
+                    <i class="fas fa-building mr-2"></i>
+                    {{ game.publisherName }}
+                  </p>
+                  <p class="flex items-center">
+                    <i class="fas fa-star mr-2"></i>
+                    {{ (game.rating || 0).toFixed(1) }} ({{ (game.globalRatingCount ||
+                    0).toLocaleString() }} ratings)
+                  </p>
+                  <p class="flex items-center">
+                    <i class="fas fa-tag mr-2"></i>
+                    {{ game.price === 0 ? 'Free' : `$${game.price.toFixed(2)}` }}
+                    <span v-if="game.inAppPurchases" class="ml-2 text-xs text-gray-500"
+                      >(In-App Purchases)</span
+                    >
+                  </p>
+                  <p class="flex items-center">
+                    <i class="fas fa-code-branch mr-2"></i>
+                    Version {{ game.version }}
+                  </p>
+                  <p class="flex items-center">
+                    <i class="fas fa-calendar mr-2"></i>
+                    Updated: {{ new Date(game.updatedDate).toLocaleDateString() }}
+                  </p>
+                </div>
+                <div class="mt-3 flex space-x-2">
+                  <a
+                    :href="game.url"
+                    target="_blank"
+                    class="text-blue-500 hover:text-blue-600 text-sm flex items-center"
+                  >
+                    <i class="fas fa-external-link-alt mr-1"></i>
+                    View in Store
+                  </a>
+                  <a
+                    :href="game.publisherProfileUrl"
+                    target="_blank"
+                    class="text-blue-500 hover:text-blue-600 text-sm flex items-center"
+                  >
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Publisher Info
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="games.length === 0 && !loading" class="text-center py-8 text-gray-500">
+          No games found. Try adjusting your search criteria.
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const { createApp } = Vue;
+
+      createApp({
+        data() {
+          return {
+            games: [],
+            loading: false,
+            error: null,
+            searchQuery: '',
+            selectedPlatform: '',
+          };
+        },
+        methods: {
+          async fetchGames() {
+            this.loading = true;
+            this.error = null;
+            try {
+              console.log('Fetching games...');
+              const response = await fetch('/api/games');
+              console.log('Fetch response status:', response.status);
+              console.log(
+                'Fetch response headers:',
+                Object.fromEntries(response.headers.entries())
+              );
+
+              if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to fetch games');
+              }
+
+              const data = await response.json();
+              console.log('Fetched games:', data);
+              this.games = data;
+            } catch (err) {
+              console.error('Fetch error:', err);
+              this.error = err.message;
+            } finally {
+              this.loading = false;
+            }
+          },
+          async searchGames() {
+            this.loading = true;
+            this.error = null;
+            try {
+              const response = await fetch('/api/games/search', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  name: this.searchQuery,
+                  platform: this.selectedPlatform || undefined,
+                }),
+              });
+              if (!response.ok) throw new Error('Failed to search games');
+              this.games = await response.json();
+            } catch (err) {
+              this.error = err.message;
+            } finally {
+              this.loading = false;
+            }
+          },
+          async populateDatabase() {
+            this.loading = true;
+            this.error = null;
+            try {
+              console.log('Sending populate request...');
+              const response = await fetch('/api/games/populate', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              });
+              const result = await response.json();
+
+              if (!response.ok) {
+                throw new Error(result.error || 'Failed to populate database');
+              }
+
+              // Refresh the games list
+              await this.fetchGames();
+            } catch (err) {
+              console.error('Populate error:', err);
+              this.error = err.message;
+            } finally {
+              this.loading = false;
+            }
+          },
+        },
+        mounted() {
+          this.fetchGames();
+        },
+      }).mount('#app');
+    </script>
+  </body>
+</html>
