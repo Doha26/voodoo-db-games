@@ -73,6 +73,14 @@ export class SequelizeGameRepository implements GameRepository {
   }
 
   /**
+   * Create a new game
+   */
+  async create(data: GameCreateInput): Promise<Game> {
+    const game = await GameModel.create(data);
+    return game.toJSON() as Game;
+  }
+
+  /**
    * Create multiple games
    */
   async createMany(games: GameCreateInput[]): Promise<Game[]> {

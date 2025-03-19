@@ -9,6 +9,7 @@ export interface GameRepository {
     minPrice?: number;
     maxPrice?: number;
   }): Promise<Game[]>;
+  create(data: GameCreateInput): Promise<Game>;
   createMany(games: GameCreateInput[]): Promise<Game[]>;
   update(id: number, data: GameUpdateInput): Promise<Game>;
   delete(id: number): Promise<void>;

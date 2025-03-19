@@ -79,4 +79,51 @@ export class GameController {
       res.status(500).json({ error: 'Failed to populate database' });
     }
   };
+
+  /**
+   * Create a new game
+   */
+  createGame = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const gameData = req.body;
+      const game = await this.gameService.createGame(gameData);
+      res.status(201).json(game);
+    } catch (error) {
+      console.error('Error creating game:', error);
+      res.status(500).json({ error: 'Failed to create game' });
+    }
+  };
+
+  /**
+   * Update an existing game
+   */
+  updateGame = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const gameData = req.body;
+      const game = await this.gameService.updateGame(parseInt(id, 10), gameData);
+      if (!game) {
+        res.status(404).json({ error: 'Game not found' });
+        return;
+      }
+      res.json(game);
+    } catch (error) {
+      console.error('Error updating game:', error);
+      res.status(500).json({ error: 'Failed to update game' });
+    }
+  };
+
+  /**
+   * Delete a game
+   */
+  deleteGame = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      await this.gameService.deleteGame(parseInt(id, 10));
+      res.status(204).send();
+    } catch (error) {
+      console.error('Error deleting game:', error);
+      res.status(500).json({ error: 'Failed to delete game' });
+    }
+  };
 }

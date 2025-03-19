@@ -16,6 +16,13 @@ export class GameService {
   }
 
   /**
+   * Create a new game
+   */
+  async createGame(data: GameCreateInput): Promise<Game> {
+    return this.gameRepository.create(data);
+  }
+
+  /**
    * Get a game by its ID
    */
   async getGameById(id: number): Promise<Game | null> {

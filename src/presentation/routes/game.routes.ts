@@ -41,5 +41,8 @@ router.get('/search', async (req: Request, res: Response) => {
 });
 router.get('/:id', gameController.getGameById);
 router.post('/populate', gameController.populateGames);
+router.post('/', gameController.createGame);
+router.put('/:id', gameController.updateGame);
+router.delete('/:id', gameController.deleteGame);
 
 export const gameRoutes = router;
