@@ -486,21 +486,14 @@
             this.loading = true;
             this.error = null;
             try {
-              console.log('Fetching games...');
               const response = await fetch('/api/games');
               console.log('Fetch response status:', response.status);
-              console.log(
-                'Fetch response headers:',
-                Object.fromEntries(response.headers.entries())
-              );
 
               if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to fetch games');
               }
-
               const data = await response.json();
-              console.log('Fetched games:', data);
               this.games = data;
             } catch (err) {
               console.error('Fetch error:', err);
