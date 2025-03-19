@@ -8,6 +8,16 @@ A RESTful API service for managing game data, built with Express, TypeScript, an
 - Search functionality by name and platform
 - Database population with top 100 apps from App Store and Google Play Store
 
+## Application Screenshots
+
+### Home Page
+
+![Home Page Screenshot](capture/index.png)
+
+### Search Feature
+
+![Search Feature Screenshot](capture/search.png)
+
 ## Prerequisites
 
 - Node.js (v14 or higher)
