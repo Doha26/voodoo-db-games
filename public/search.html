@@ -116,19 +116,34 @@
             this.loading = true;
             this.error = null;
             try {
-              const response = await fetch('/api/games/search', {
-                method: 'POST',
+              const searchParams = new URLSearchParams();
+
+              // Add search query if it exists
+              if (this.searchQuery.trim()) {
+                searchParams.append('name', this.searchQuery.trim());
+              }
+
+              // Add platform if selected
+              if (this.selectedPlatform) {
+                searchParams.append('platform', this.selectedPlatform);
+              }
+
+              const response = await fetch(`/api/games/search?${searchParams.toString()}`, {
+                method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                  name: this.searchQuery,
-                  platform: this.selectedPlatform || undefined,
-                }),
               });
-              if (!response.ok) throw new Error('Failed to search games');
-              this.games = await response.json();
+
+              if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to search games');
+              }
+
+              const data = await response.json();
+              this.games = data;
             } catch (err) {
+              console.error('Search error:', err);
               this.error = err.message;
             } finally {
               this.loading = false;
