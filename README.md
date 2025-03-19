@@ -14,6 +14,10 @@ A RESTful API service for managing game data, built with Express, TypeScript, an
 
 ![Home Page Screenshot ](capture/index.png)
 
+### Add `http://localhost:3000/index.html`
+
+![Search Feature Screenshot](capture/add.png)
+
 ### Search `http://localhost:3000/search.html`
 
 ![Search Feature Screenshot](capture/search.png)
