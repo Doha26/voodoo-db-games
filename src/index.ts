@@ -1,8 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import { sequelize } from './config/database';
-import { gameRoutes } from './routes/game.routes';
+import { sequelize } from './infrastructure/database';
+import { gameRoutes } from './presentation/routes/game.routes';
+import { errorHandler } from './presentation/middlewares/error.middleware';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,9 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
+// Error handling
+app.use(errorHandler);
+
 // Initialize database and start server
 const startServer = async (): Promise<void> => {
   try {
@@ -30,10 +34,10 @@ const startServer = async (): Promise<void> => {
     console.log('Database synchronized successfully');
 
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {
-    console.error('Unable to start server:', error);
+    console.error('Failed to start server:', error);
     process.exit(1);
   }
 };

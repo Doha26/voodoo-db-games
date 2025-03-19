@@ -1,5 +1,5 @@
+import { sequelize } from '@/infrastructure/database/sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { sequelize } from '../config/database';
 import { z } from 'zod';
 
 export const GameSchema = z.object({
