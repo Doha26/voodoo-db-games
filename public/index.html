@@ -515,14 +515,18 @@
             try {
               const searchParams = new URLSearchParams();
 
-              // Add search query if it exists
+              // Only add search parameters if they have values
               if (this.searchQuery.trim()) {
                 searchParams.append('name', this.searchQuery.trim());
               }
-
-              // Add platform if selected
               if (this.selectedPlatform) {
                 searchParams.append('platform', this.selectedPlatform);
+              }
+
+              // If no search criteria provided, fetch all games
+              if (!searchParams.toString()) {
+                await this.fetchGames();
+                return;
               }
 
               const response = await fetch(`/api/games/search?${searchParams.toString()}`, {

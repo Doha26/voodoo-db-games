@@ -40,24 +40,26 @@ export class SequelizeGameRepository implements GameRepository {
    * Find games by search criteria
    */
   async search(criteria: {
-    query?: string;
+    name?: string;
     platform?: string;
     minPrice?: number;
     maxPrice?: number;
   }): Promise<Game[]> {
     const where: WhereClause = {};
 
-    if (criteria.query) {
-      where[Op.or] = [
-        { name: { [Op.like]: `%${criteria.query}%` } },
-        { description: { [Op.like]: `%${criteria.query}%` } },
-      ];
+    // Add name filter if provided
+    if (criteria.name) {
+      where.name = {
+        [Op.like]: `%${criteria.name}%`,
+      };
     }
 
+    // Add platform filter if provided
     if (criteria.platform) {
-      where.platform = criteria.platform as Platform;
+      where.platform = criteria.platform.toLowerCase() as Platform;
     }
 
+    // Add price range if provided
     if (criteria.minPrice !== undefined || criteria.maxPrice !== undefined) {
       where.price = {};
       if (criteria.minPrice !== undefined) {

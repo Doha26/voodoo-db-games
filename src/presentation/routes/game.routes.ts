@@ -3,7 +3,6 @@ import { GameController } from '@presentation/controllers/game.controller';
 import { GameService } from '@application/services/game.service';
 import { SequelizeGameRepository } from '@infrastructure/repositories/sequelize-game.repository';
 import { Request, Response } from 'express';
-import { Op } from 'sequelize';
 import { WhereOptions } from 'sequelize';
 
 const router = Router();
@@ -22,14 +21,19 @@ router.get('/search', async (req: Request, res: Response) => {
 
     // Add name filter if provided
     if (name && typeof name === 'string') {
-      searchParams.name = {
-        [Op.iLike]: `%${name}%`,
-      };
+      searchParams.name = name;
     }
 
     // Add platform filter if provided
     if (platform && typeof platform === 'string') {
       searchParams.platform = platform.toLowerCase();
+    }
+
+    // If no search parameters provided, return all games
+    if (Object.keys(searchParams).length === 0) {
+      const games = await gameService.getAllGames();
+      res.json(games);
+      return;
     }
 
     const games = await gameService.searchGames(searchParams);

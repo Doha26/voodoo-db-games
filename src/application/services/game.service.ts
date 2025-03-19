@@ -33,7 +33,7 @@ export class GameService {
    * Search for games based on criteria
    */
   async searchGames(criteria: {
-    query?: string;
+    name?: string;
     platform?: string;
     minPrice?: number;
     maxPrice?: number;

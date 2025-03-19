@@ -54,7 +54,7 @@ export class GameController {
     try {
       const { query, platform, minPrice, maxPrice } = req.query;
       const games = await this.gameService.searchGames({
-        query: query as string | undefined,
+        name: query as string | undefined,
         platform: platform as string | undefined,
         minPrice: minPrice ? parseFloat(minPrice as string) : undefined,
         maxPrice: maxPrice ? parseFloat(maxPrice as string) : undefined,
