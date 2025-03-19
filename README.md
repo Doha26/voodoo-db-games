@@ -8,13 +8,13 @@ A RESTful API service for managing game data, built with Express, TypeScript, an
 - Search functionality by name and platform
 - Database population with top 100 apps from App Store and Google Play Store
 
-## Application Screenshots
+## Screenshots
 
-### Home Page
+### Home Page `http://localhost:3000/index.html`
 
-![Home Page Screenshot](capture/index.png)
+![Home Page Screenshot ](capture/index.png)
 
-### Search Feature
+### Search `http://localhost:3000/search.html`
 
 ![Search Feature Screenshot](capture/search.png)
 
@@ -57,6 +57,7 @@ A RESTful API service for managing game data, built with Express, TypeScript, an
    ```
 
 The API will be available at `http://localhost:3000`
+Screens display are available at `http://localhost:3000/index.html` and `http://localhost:3000/search.html`
 
 ## API Endpoints
 
